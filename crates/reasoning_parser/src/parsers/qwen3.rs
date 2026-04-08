@@ -24,6 +24,7 @@ impl Qwen3Parser {
             stream_reasoning: true,
             max_buffer_size: DEFAULT_MAX_BUFFER_SIZE,
             always_in_reasoning: false,
+            tool_section_start_markers: Vec::new(),
         };
 
         Self {
@@ -87,6 +88,7 @@ impl QwenThinkingParser {
             stream_reasoning: true,
             max_buffer_size: DEFAULT_MAX_BUFFER_SIZE,
             always_in_reasoning: true,
+            tool_section_start_markers: Vec::new(),
         };
 
         Self {
