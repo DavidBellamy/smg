@@ -4,10 +4,7 @@ use std::borrow::Cow;
 
 use async_trait::async_trait;
 use axum::response::Response;
-use openai_protocol::{
-    chat::ChatCompletionRequest,
-    common::{ToolChoice, ToolChoiceValue},
-};
+use openai_protocol::chat::ChatCompletionRequest;
 use tracing::{debug, error};
 
 use crate::routers::{
@@ -205,28 +202,12 @@ impl ChatPreparationStage {
             None
         };
 
-        // Derive skip_special_tokens from constraint type:
-        // - json_schema → output is pure JSON, special tokens not needed
-        // - structural_tag or no constraint with tools → parser needs special token delimiters
-        let skip_special_tokens = match &tool_call_constraint {
-            Some(c) if c.is_json_schema() => request.skip_special_tokens,
-            _ if request.tools.is_some()
-                && !matches!(
-                    request.tool_choice,
-                    Some(ToolChoice::Value(ToolChoiceValue::None))
-                ) =>
-            {
-                false
-            }
-            _ => request.skip_special_tokens,
-        };
-
         // Step 5: Create stop sequence decoder (build once, reuse in non-stream)
         let stop_decoder = utils::create_stop_decoder(
             &tokenizer,
             request.stop.as_ref(),
             request.stop_token_ids.as_ref(),
-            skip_special_tokens,
+            request.skip_special_tokens,
             request.no_stop_trim,
         );
 
